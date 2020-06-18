@@ -1,0 +1,79 @@
+{
+  "name": "todo-backend",
+  "version": "0.0.0",
+  "description": "My Project",
+  "esy": {
+    "build": "dune build -p <PACKAGE_NAME>",
+    "buildDev": "pesy",
+    "release": {
+      "releasedBinaries": [
+        "TodoBackendApp.exe"
+      ]
+    }
+  },
+  "buildDirs": {
+    "test": {
+      "require": [
+        "todo-backend.lib"
+      ],
+      "main": "TestTodoBackend",
+      "name": "TestTodoBackend.exe"
+    },
+    "library": {
+      "name": "todo-backend.lib",
+      "namespace": "TodoBackend"
+    },
+    "executable": {
+      "require": [
+        "todo-backend.lib",
+        "lwt",
+        "caqti",
+        "caqti-lwt",
+        "caqti-driver-postgresql",
+        "re-web",
+        "ppx_rapper.runtime",
+        "decoders-yojson"
+      ],
+      "main": "TodoBackendApp",
+      "name": "TodoBackendApp.exe",
+      "preprocess": [
+        "pps",
+        "ppx_deriving_yojson",
+        "lwt_ppx",
+        "ppx_deriving.make",
+        "ppx_rapper"
+      ]
+    }
+  },
+  "scripts": {
+    "pesy": "bash -c 'env PESY_MODE=update pesy'",
+    "test": "esy x TestTodoBackend.exe",
+    "start": "esy x TodoBackendApp.exe"
+  },
+  "dependencies": {
+    "@esy-ocaml/reason": "*",
+    "@opam/caqti": "1.2.1",
+    "@opam/caqti-driver-postgresql": "1.2.1",
+    "@opam/caqti-lwt": "1.2.0",
+    "@opam/decoders-yojson": "0.4.0",
+    "@opam/dune": ">=1.6.0",
+    "@opam/lwt": "5.3.0",
+    "@opam/lwt_ppx": "2.0.1",
+    "@opam/ppx_deriving": "4.5",
+    "@opam/ppx_deriving_yojson": "3.5.2",
+    "@opam/ppx_rapper": "1.1.1",
+    "@opam/re-web": "*",
+    "ocaml": "~4.8.1000"
+  },
+  "devDependencies": {
+    "ocaml": "~4.8.1000",
+    "refmterr": "*",
+    "pesy": "*",
+    "@opam/merlin": "*"
+  },
+  "resolutions": {
+    "@opam/re-web": "yawaramin/re-web:package.json#15907ba",
+    "@opam/ctypes-foreign": "esy-ocaml/libffi#c61127d"
+  }
+}
+
