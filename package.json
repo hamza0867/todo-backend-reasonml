@@ -5,6 +5,9 @@
   "esy": {
     "build": "dune build -p <PACKAGE_NAME>",
     "buildDev": "pesy",
+    "buildEnv": {
+      "LD_LIBRARY_PATH": "$LIBFFI_BUILD_DIR/lib:$LD_LIBRARY_PATH"
+    },
     "release": {
       "releasedBinaries": [
         "TodoBackendApp.exe"
