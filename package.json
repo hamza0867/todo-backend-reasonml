@@ -66,10 +66,10 @@
     "@opam/ppx_deriving_yojson": "3.5.2",
     "@opam/ppx_rapper": "1.1.1",
     "@opam/re-web": "*",
-    "ocaml": "~4.8.1000"
+    "ocaml": "~4.9.0"
   },
   "devDependencies": {
-    "ocaml": "~4.8.1000",
+    "ocaml": "~4.9.0",
     "refmterr": "*",
     "pesy": "*",
     "@opam/merlin": "*"
@@ -79,4 +79,3 @@
     "@opam/ctypes-foreign": "esy-ocaml/libffi#c61127d"
   }
 }
-
