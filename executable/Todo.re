@@ -68,6 +68,21 @@ module Repository = {
 
   let pool = Database.pool;
 
+  let create_table = [%rapper
+    execute(
+      {sql|
+      CREATE TABLE IF NOT EXISTS todos (
+        id serial,
+        title VARCHAR(128) NOT NULL,
+        completed BOOLEAN DEFAULT TRUE,
+        PRIMARY KEY (id)
+      );
+      |sql},
+    )
+  ];
+
+  Caqti_lwt.Pool.use(create_table(_, ()), pool);
+
   let get_all = () => {
     let get_all_query = [%rapper
       get_many(
