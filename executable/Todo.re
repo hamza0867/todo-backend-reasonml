@@ -81,7 +81,7 @@ module Repository = {
     )
   ];
 
-  Caqti_lwt.Pool.use(create_table(_, ()), pool);
+  Caqti_lwt.Pool.use(create_table(), pool);
 
   let get_all = () => {
     let get_all_query = [%rapper
@@ -90,9 +90,7 @@ module Repository = {
         record_out,
       )
     ];
-    let get_all' = (module C: Caqti_lwt.CONNECTION) =>
-      get_all_query((module C), ());
-    Caqti_lwt.Pool.use(get_all', pool) |> or_error;
+    Caqti_lwt.Pool.use(get_all_query(), pool) |> or_error;
   };
 
   let get_one_by_id = id => {
@@ -102,9 +100,7 @@ module Repository = {
         record_out,
       )
     ];
-    let get_one' = (module C: Caqti_lwt.CONNECTION) =>
-      get_one_query((module C), ~id);
-    Caqti_lwt.Pool.use(get_one', pool) |> or_error;
+    Caqti_lwt.Pool.use(get_one_query(~id), pool) |> or_error;
   };
 
   let create_one = (unregistered: Unregistered.t) => {
@@ -117,10 +113,8 @@ module Repository = {
 
     let {title, completed}: Unregistered.t = unregistered;
 
-    let create_one' = (module C: Caqti_lwt.CONNECTION) =>
-      create_one_query((module C), ~title, ~completed);
-
-    Caqti_lwt.Pool.use(create_one', pool) |> or_error;
+    Caqti_lwt.Pool.use(create_one_query(~title, ~completed), pool)
+    |> or_error;
   };
 
   let update_one = (id, unregistered) => {
@@ -129,11 +123,11 @@ module Repository = {
         {sql| UPDATE todos SET (title, completed) = (%string{title}, %bool{completed}) WHERE id = %int{id}  |sql},
       )
     ];
-    let {title, completed}: Unregistered.t = unregistered;
-    let update_one' = (module C: Caqti_lwt.CONNECTION) =>
-      update_one_query((module C), ~title, ~completed, ~id);
 
-    Caqti_lwt.Pool.use(update_one', pool) |> or_error;
+    let {title, completed}: Unregistered.t = unregistered;
+
+    Caqti_lwt.Pool.use(update_one_query(~id, ~title, ~completed), pool)
+    |> or_error;
   };
 };
 

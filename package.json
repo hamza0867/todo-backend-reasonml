@@ -64,7 +64,7 @@
     "@opam/lwt_ppx": "2.0.1",
     "@opam/ppx_deriving": "4.5",
     "@opam/ppx_deriving_yojson": "3.5.2",
-    "@opam/ppx_rapper": "1.1.1",
+    "@opam/ppx_rapper": "2.0.0",
     "@opam/re-web": "*",
     "ocaml": "~4.9.0"
   },

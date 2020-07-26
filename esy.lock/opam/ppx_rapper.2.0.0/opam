@@ -11,9 +11,10 @@ depends: [
   "dune" {>= "2.0.1"}
   "pg_query"
   "ppxlib"
-  "base" {< "v0.15"}
+  "base"
   "caqti"
   "caqti-lwt"
+  "caqti-type-calendar" {with-test}
 ]
 build: [
   ["dune" "subst"] {pinned}
@@ -31,9 +32,9 @@ build: [
 ]
 dev-repo: "git+https://github.com/roddyyaga/ppx_rapper.git"
 url {
-  src: "https://github.com/roddyyaga/ppx_rapper/archive/1.1.1.tar.gz"
+  src: "https://github.com/roddyyaga/ppx_rapper/archive/2.0.0.tar.gz"
   checksum: [
-    "md5=18a069630784aa6ad83871c02b32a3e0"
-    "sha512=6a8ec278d5529376e1f2ea0e594806971b4028e4ce1d2f79a4acd65e07d84c890b2c64f245483041b78a94381a6453ffba84592ef9ef1c41ffbf65f4c1e35857"
+    "md5=e85f19f67e4f5d5b73abbc9f8d3545e8"
+    "sha512=4e8171f166cdca798da8d6ff56c9cf6f988822b871449d6488cb49c496498663482b08238eeb9954513e30a3433dd54800d21cd5188468548450ea63f21bbba3"
   ]
 }
