@@ -66,13 +66,14 @@
     "@opam/ppx_deriving_yojson": "3.5.2",
     "@opam/ppx_rapper": "2.0.0",
     "@opam/re-web": "*",
-    "ocaml": "~4.9.0"
+    "ocaml": "~4.10.0"
   },
   "devDependencies": {
-    "ocaml": "~4.9.0",
+    "ocaml": "~4.10.0",
     "refmterr": "*",
     "pesy": "*",
-    "@opam/merlin": "*"
+    "@opam/merlin": "*",
+    "@opam/ocaml-lsp-server": "ocaml/ocaml-lsp:ocaml-lsp-server.opam"
   },
   "resolutions": {
     "@opam/re-web": "yawaramin/re-web:package.json#15907ba",
