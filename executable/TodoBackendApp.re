@@ -3,10 +3,16 @@ module D = Decoders_yojson.Safe.Decode;
 
 let server =
   fun
+  | (meth, ["users", ...path]) =>
+    ReWeb.Filter.cors(Header.AccessControlAllowOrigin.All) @@
+    User.resource @@
+    (meth, path)
+
   | (meth, ["todos", ...path]) =>
     ReWeb.Filter.cors(Header.AccessControlAllowOrigin.All) @@
     Todo.resource @@
     (meth, path)
+
   | (_, path) => (
       _ =>
         Response.of_text(

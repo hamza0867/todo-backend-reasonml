@@ -4,28 +4,39 @@ module D = Decoders_yojson.Safe.Decode;
 module Entity = {
   [@deriving to_yojson]
   type t = {
-    id: int,
+    id: Models.Id.t,
     title: string,
     completed: bool,
+    user_id: Models.Id.t,
+  };
+
+  let make = (~id, ~title, ~completed, ~user_id) => {
+    id,
+    title,
+    completed,
+    user_id,
   };
 
   module Unregistered = {
     type t = {
       title: string,
       completed: bool,
+      user_id: Models.Id.t,
     };
 
-    let make = (title, completed) => {
+    let make = (title, completed, user_id) => {
       title,
+      user_id: Models.Id.from_int(user_id),
       completed: completed |> TodoBackend.Util.get_with_default(false),
     };
 
-    let of_yojson = {
+    let of_yojson: Yojson.Safe.t => result(t, D.error) = {
       open D;
       let (<$>) = D.map;
       make
       <$> field("title", string)
       <*> field_opt("completed", bool)
+      <*> field("user_id", int)
       |> D.decode_value;
     };
   };
@@ -52,10 +63,11 @@ module Entity = {
     title: partial.title |> TodoBackend.Util.get_with_default(todo.title),
     completed:
       partial.completed |> TodoBackend.Util.get_with_default(todo.completed),
+    user_id: todo.user_id,
   };
 };
 
-module Repository = {
+module MakeRepository = (Database: Database.Connection) => {
   open Entity;
   open Database;
 
@@ -75,7 +87,11 @@ module Repository = {
         id serial,
         title VARCHAR(128) NOT NULL,
         completed BOOLEAN DEFAULT TRUE,
-        PRIMARY KEY (id)
+        user_id INT,
+        PRIMARY KEY (id),
+        CONSTRAINT fk_user
+          FOREIGN KEY(user_id)
+            REFERENCES users(id)
       );
       |sql},
     )
@@ -84,36 +100,61 @@ module Repository = {
   Caqti_lwt.Pool.use(create_table(), pool);
 
   let get_all = () => {
-    let get_all_query = [%rapper
-      get_many(
-        {sql| SELECT @int{id}, @string{title}, @bool{completed} FROM todos ORDER BY id|sql},
-        record_out,
-      )
-    ];
+    let get_all_query =
+      [%rapper
+        get_many(
+          {sql| SELECT @int{id}, @string{title}, @bool{completed}, @int{user_id} FROM todos ORDER BY id|sql},
+          function_out,
+        )
+      ](
+        (~user_id, ~completed, ~title, ~id) =>
+        Entity.make(
+          ~id=Models.Id.from_int(id),
+          ~user_id=Models.Id.from_int(id),
+          ~title,
+          ~completed,
+        )
+      );
     Caqti_lwt.Pool.use(get_all_query(), pool) |> or_error;
   };
 
   let get_one_by_id = id => {
-    let get_one_query = [%rapper
-      get_opt(
-        {sql| SELECT @int{id}, @string{title}, @bool{completed} FROM todos WHERE id = %int{id} |sql},
-        record_out,
-      )
-    ];
+    let get_one_query =
+      [%rapper
+        get_opt(
+          {sql| SELECT @int{id}, @string{title}, @bool{completed}, @int{user_id} FROM todos WHERE id = %int{id} |sql},
+          function_out,
+        )
+      ](
+        (~user_id, ~completed, ~title, ~id) =>
+        Entity.make(
+          ~id=Models.Id.from_int(id),
+          ~user_id=Models.Id.from_int(id),
+          ~title,
+          ~completed,
+        )
+      );
     Caqti_lwt.Pool.use(get_one_query(~id), pool) |> or_error;
   };
 
   let create_one = (unregistered: Unregistered.t) => {
     let create_one_query = [%rapper
       execute(
-        {sql| INSERT INTO todos(title, completed)
-          VALUES (%string{title}, %bool{completed})|sql},
+        {sql| INSERT INTO todos(title, completed, user_id)
+          VALUES (%string{title}, %bool{completed}, %int{user_id})|sql},
       )
     ];
 
-    let {title, completed}: Unregistered.t = unregistered;
+    let {title, completed, user_id}: Unregistered.t = unregistered;
 
-    Caqti_lwt.Pool.use(create_one_query(~title, ~completed), pool)
+    Caqti_lwt.Pool.use(
+      create_one_query(
+        ~title,
+        ~completed,
+        ~user_id=Models.Id.to_int(user_id),
+      ),
+      pool,
+    )
     |> or_error;
   };
 
@@ -133,6 +174,8 @@ module Repository = {
 
 open Lwt.Infix;
 open Entity;
+
+module Repository = MakeRepository(Database.Connection);
 
 let index = _req =>
   Repository.get_all()
